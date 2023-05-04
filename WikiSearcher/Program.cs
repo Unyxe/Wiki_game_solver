@@ -26,7 +26,8 @@ namespace WikiSearcher
             Console.WriteLine("\t\tWiki solver by Unyxe\n\n");
             while (true)
             {
-                
+                links.Clear();
+                link_htmls.Clear();
                 Console.Write("Enter start url: ");
                 start_link = Console.ReadLine();
                 Console.Write("Enter target url: ");
@@ -49,7 +50,7 @@ namespace WikiSearcher
                         break;
                     }
 
-                    int index = rn.Next()%2;
+                    int index = 0;
                     links.Add(wiki_link + links_found_on_current[index]);
                     link_htmls.Add(link_html);
                 }
