@@ -1,0 +1,12 @@
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\bin\Debug\WikiSearcher.exe.config
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\bin\Debug\WikiSearcher.exe
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\bin\Debug\WikiSearcher.pdb
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\bin\Debug\HtmlAgilityPack.dll
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\bin\Debug\HtmlAgilityPack.xml
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.csproj.AssemblyReference.cache
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.csproj.SuggestedBindingRedirects.cache
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.csproj.CoreCompileInputs.cache
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.csproj.CopyComplete
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.exe
+C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.pdb
