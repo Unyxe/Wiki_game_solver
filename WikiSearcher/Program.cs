@@ -14,11 +14,16 @@ namespace WikiSearcher
     {
         static string wiki_link = "https://en.wikipedia.org";
         static List<string> links  = new List<string>();
-        static List<string> link_htmls = new List<string>(); 
+        static List<string> link_htmls = new List<string>();
+        static List<string> txt_vars = new List<string>();
+
+        static string[] common_words = new string[] { "list", "disambiguation", "wiki", "unit", "time", "group","game", "kirk", "christiansen" };
 
 
-        static string start_link = "";
-        static string target_link = "";
+        static string final_start_link = "https://en.wikipedia.org/wiki/Pancreatic_cancer";
+        static string bridge_link = "https://en.wikipedia.org/wiki/Mathematics";
+        static string final_target_link = "https://en.wikipedia.org/wiki/Riemann_hypothesis";
+        static bool step = false;
 
         static Random rn = new Random();
         static void Main(string[] args)
@@ -26,45 +31,102 @@ namespace WikiSearcher
             Console.WriteLine("\t\tWiki solver by Unyxe\n\n");
             while (true)
             {
-                links.Clear();
-                link_htmls.Clear();
-                Console.Write("Enter start url: ");
-                start_link = Console.ReadLine();
-                Console.Write("Enter target url: ");
-                target_link = Console.ReadLine();
-                links.Add(start_link);
-                link_htmls.Add(GetRawResponse(start_link));
+                
+                string target_link = "";
+                string start_link = "";
+                if (!step)
+                {
+                    links.Clear();
+                    link_htmls.Clear();
+                    Console.Write("Enter start url: ");
+                    //final_start_link = Console.ReadLine();
+                    Console.Write("Enter target url: ");
+                    //final_target_link = Console.ReadLine();
+                    target_link = bridge_link;
+                    start_link = final_start_link;
+                    links.Add(start_link);
+                    link_htmls.Add(GetRawResponse(start_link));
+                    txt_vars.Add("start_page");
+                } else
+                {
+                    target_link = final_target_link;
+                    start_link = bridge_link;
+                }
+                Console.WriteLine();
+                var tem = target_link.Split('/');
+                string target_article_name = tem[tem.Length - 1].ToLower();
                 string target_html = GetRawResponse(target_link);
-                string[] links_found_on_target = GetAllLinks(target_html);
+                string[] links_found_on_target = extract_column(GetAllLinks(target_html), 0);
+                List<string> key_words_list = new List<string>();
+                foreach(string l in links_found_on_target)
+                {
+                    string link_words = l.Replace("/", "_"); 
+                    foreach(string b in link_words.Split('_'))
+                    {
+                        
+                        string j = b.ToLower().Replace("(", String.Empty).Replace(")", String.Empty);
+                        j = j.Split('#')[0];
+                        if (common_words.Contains(j)) continue;
+                        bool is_cont = false;
+                        foreach (string gh in key_words_list)
+                        {
+                            if(gh.Contains(j) || j.Contains(gh))
+                            {
+                                is_cont = true;
+                                break;
+                            }
+                        }
+                        if (is_cont) continue;
+                        if (j==target_article_name||j == " "||j==""||key_words_list.Contains(j) ||j.Length<4) continue;
+                        
+
+                        key_words_list.Add(j);
+                        //Console.WriteLine("RAWKEY:    |" + j + "|");
+                    }
+                }
+                List<string> tempo = SortByFrequency(key_words_list.ToArray()).ToList();
+                tempo.Insert(0, target_article_name);
+                string[] key_words = tempo.GetRange(0, 5).ToArray();
+                foreach (string l in key_words)
+                {
+                    Console.WriteLine("RAWBKEY:    |" + l + "|");
+                }
+                //Console.ReadLine();
                 while (true)
                 {
                     string current_link = links.Last();
                     string link_html = GetRawResponse(current_link);
-                    string[] links_found_on_current = GetAllLinks(link_html);
+                    string[] links_found_on_current = extract_column(GetAllLinks(link_html), 0);
+                    string[] txt = extract_column(GetAllLinks(link_html), 1);
 
-                    bool g = CheckSimil(links_found_on_target, links_found_on_current);
-                    Console.WriteLine(g ? "Found!" : "Continue..." + " Current link: " + current_link);
-
-                    if (g)
+                    string g = CheckSimil(key_words, links_found_on_current, txt, target_link);
+                    Console.Write(g=="sim" ? "Similarity found! " : "Similarity not found... ");
+                    //Console.WriteLine(" Current link: " + current_link);
+                    Console.WriteLine(" Found link: " + links.Last());
+                    if (g == "sim") continue;
+                    if (g == "fin")
                     {
+                        Console.WriteLine("Pathway FOUND!");
                         break;
                     }
 
                     int index = 0;
                     links.Add(wiki_link + links_found_on_current[index]);
                     link_htmls.Add(link_html);
+                    txt_vars.Add(txt[index]);
                 }
                 links.Add(target_link);
                 link_htmls.Add(target_html);
-                Console.WriteLine();
-                Console.WriteLine("Optimisation...");
-                Console.WriteLine();
-                Optimise();
-                foreach (string g in links)
+                txt_vars.Add("target_link");
+                if (step)
                 {
-                    Console.WriteLine(g);
+                    foreach (string g in links)
+                    {
+                        Console.WriteLine(g);
+                    }
+                    Console.WriteLine("\n\n");
                 }
-                Console.WriteLine("\n\n");
+                step = !step;
             }
         }
 
@@ -86,25 +148,38 @@ namespace WikiSearcher
             byte[] responseData = response.Content.ReadAsByteArrayAsync().Result;
             return Encoding.ASCII.GetString(responseData);
         }
-        static string[] GetAllLinks(string link_html)
+        static string[][] GetAllLinks(string link_html)
         {
             
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(link_html);
-            List<string> links_found = new List<string>();
+            List<string[]> links_found = new List<string[]>();
             int m = 0;
             foreach (HtmlNode link in htmlDoc.DocumentNode.SelectNodes("//a[@href]"))
             {
                 string link_str = link.GetAttributeValue("href", "");
-                if (link_str.StartsWith("/wiki/") && !IfContains(link_str, new string[] { ".", ":" }) && !links_found.Contains(link_str) && link_str != "/wiki/Main_Page" && !links.Contains(wiki_link + link_str))
+                string txt_value = link.InnerText;
+                string[] g = new string[] { link_str, txt_value };
+                if (link_str == "/wiki/Riemann_hypothesis") Console.ReadLine();
+                if (link_str.StartsWith("/wiki/") && !IfContains(link_str, new string[] { ".", ":" }) && !links_found.Contains(g) && link_str != "/wiki/Main_Page" && !links.Contains(wiki_link + link_str))
                 {
                     
-                    links_found.Add(link_str);
+                    links_found.Add(g);
                     m++;
                 }
             }
             return links_found.ToArray();
         }
+        static string[] extract_column(string[][] arr, int column_index)
+        {
+            List<string> c = new List<string>();
+            foreach(string[] l in arr)
+            {
+                c.Add(l[column_index]);
+            }
+            return c.ToArray();
+        }
+        
         static string[] GetAllWikiLinks(string link_html)
         {
 
@@ -124,59 +199,97 @@ namespace WikiSearcher
             }
             return links_found.ToArray();
         }
-        static void Optimise()
+        static string CheckSimil(string[] key_words, string[] searched_links, string[] txt_vars_, string target_link)
         {
-            int l = links.Count;
-            for(int i = 0; i <l; i++)
+            int i = 0;
+            foreach (string link in searched_links)
             {
-                string[] links_found = GetAllWikiLinks(link_htmls[i]);
-                for (int j = i+2;j<l;j++)
+
+                if (target_link == wiki_link + link) return "fin";
+
+                List<string> key_words_list = new List<string>();
+                string link_words = link.Replace("/", "_");
+                foreach (string b in link_words.Split('_'))
                 {
-                    if (links_found.Contains(links[j]))
-                    {
-                        for(int k = i+1;k < j; k++)
-                        {
-                            int gh = links.IndexOf(links[k]);
-                            links.RemoveAt(gh);
-                            link_htmls.RemoveAt(gh);
-                        }
-                    }
+
+                    string j = b.ToLower().Replace("(", String.Empty).Replace(")", String.Empty);
+                    j = j.Split('#')[0];
+                    if (j.Contains("disambiguation") || j.Contains("wiki") || j == " " || j == "" || key_words_list.Contains(j) || j.Length < 4) continue;
+
+                    key_words_list.Add(j);
                 }
+
+                foreach (string key_word in key_words)
+                {
+                    if (key_words_list.Contains(key_word))
+                    {
+                        //Console.WriteLine("_________" + key_word + ":::::::::" + link);
+                        string s_html = GetRawResponse(wiki_link + link);
+                        links.Add(wiki_link + link);
+                        link_htmls.Add(s_html);
+                        txt_vars.Add(txt_vars_[i]);
+                        return "sim";
+                    }
+
+                }
+               
+                i++;
             }
             
+            return "nosim";
         }
-        static void PrintAllLinks(string  link_url)
+        static string[] SortByFrequency(string[] words)
         {
-            Console.WriteLine("_______________________________");
-            foreach(string s in GetAllLinks(link_url))
+            List<string> sorted_words = new List<string>();
+            int[] occurences = new int[words.Length];
+            float sum_occ = 0;
+            for(int i =0; i < occurences.Length; i++)
             {
-                Console.WriteLine(s);
+                occurences[i] = 0;
             }
-            Console.WriteLine("_______________________________");
-        }
-        static bool CheckSimil(string[] a1, string[] a2)
-        {
-            foreach(string s in a1)
+            foreach(string w in words)
             {
-                if (a2.Contains(s))
+                int ind = 0;
+                foreach(string w2 in words)
                 {
-                    string s_html = GetRawResponse(wiki_link + s);
-                    string[] b = GetAllLinks(s_html);
-                    foreach(string g in b)
-                    {
-                        if(wiki_link+g == target_link)
-                        {
-                            if (wiki_link + s != target_link)
-                            {
-                                links.Add(wiki_link + s);
-                                link_htmls.Add(s_html);
-                            }
-                            return true;
-                        }
-                    }
+                    if (w.Contains(w2) || w2.Contains(w)) occurences[ind]++;
+                    ind++;
                 }
             }
-            return false;
+            foreach(int i in occurences)
+            {
+                sum_occ += i;
+            }
+
+            for(int i = 0; i < words.Length; i++)
+            {
+                //Console.WriteLine("OCCUR FIND:     " + words[i] + "   " + occurences[i] / sum_occ * 100 + "%");
+            }
+
+            //Sorting
+            List<int> sorted_indexes = new List<int>();
+            while(sorted_indexes.Count < occurences.Length)
+            {
+                int max_int = -1;
+                int max_index = -1;
+                for(int i = 0; i < occurences.Length; i++)
+                {
+                    if (sorted_indexes.Contains(i)) continue;
+                    if(occurences[i] > max_int)
+                    {
+                        max_int = occurences[i];
+                        max_index = i;
+                    }
+                }
+                if(max_index == -1)
+                {
+                    break;
+                }
+                sorted_indexes.Add(max_index);
+                sorted_words.Add(words[max_index]);
+            }
+
+            return sorted_words.ToArray();
         }
     }
 }

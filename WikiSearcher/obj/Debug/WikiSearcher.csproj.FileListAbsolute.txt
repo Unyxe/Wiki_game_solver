@@ -10,3 +10,14 @@ C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.csp
 C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.csproj.CopyComplete
 C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.exe
 C:\Users\lucky\source\repos\WikiSearcher\WikiSearcher\obj\Debug\WikiSearcher.pdb
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\bin\Debug\WikiSearcher.exe.config
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\bin\Debug\WikiSearcher.exe
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\bin\Debug\WikiSearcher.pdb
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\bin\Debug\HtmlAgilityPack.dll
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\bin\Debug\HtmlAgilityPack.pdb
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\bin\Debug\HtmlAgilityPack.xml
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\obj\Debug\WikiSearcher.csprojAssemblyReference.cache
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\obj\Debug\WikiSearcher.csproj.CoreCompileInputs.cache
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\obj\Debug\WikiSearcher.csproj.CopyComplete
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\obj\Debug\WikiSearcher.exe
+\\lutcfs01.lutc.internal\student$\TPerfilov\Documents\Visual Studio 2019\Wiki_game_solver-main\WikiSearcher\obj\Debug\WikiSearcher.pdb
